@@ -1,8 +1,8 @@
 # Part1
-This file conatain all apps from part one of the course.
+This file contains all apps from part 1 of the course.
 
 ## Installation
-If you want clone the project use the package manager [npm](https://www.npmjs.com/) to install node modules, run the command
+If you want to clone the project use the package manager [npm](https://www.npmjs.com/) to install node modules, run the command
 ```bash
 npm install
 ```
