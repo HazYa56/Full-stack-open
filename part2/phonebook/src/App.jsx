@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const PersonForm = ({fieldData, onSubmit, onNameChange, onNumberChange}) => {
   return (
@@ -20,20 +21,22 @@ const Persons = ({ personList }) => { return(personList.map(person => <Person ke
 const Filter = ({ searchValue, onChange }) => { return(<p>filter shown with <input value={searchValue} onChange={onChange} /></p>) }
 
 const App = () => {
-  /* States */
+  /* States & Effects */
   const [search, setSearch] = useState('')
   const [newPerson, setNewPerson] = useState({
     name:'',
     number: ''
   })
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 56329 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 23454 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 85693 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 89862 }
-  ])
+  const [persons, setPersons] = useState([])
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
   const personsSearched = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
-
+  
   /* Event handlers */
   const handleSearchChange = (event) => {
     setSearch(event.target.value)
