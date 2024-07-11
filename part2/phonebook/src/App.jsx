@@ -45,14 +45,14 @@ const App = () => {
     setNewPerson({ 
       name: event.target.value,
       number: newPerson.number,
-      id: Math.round(Math.random()*1e5)
+      id: Math.round(Math.random()*1e5).toString()
     })
   }
   const handleNumberChange = (event) => {
     setNewPerson({ 
       name: newPerson.name,
       number: event.target.value,
-      id: Math.round(Math.random()*1e5)
+      id: Math.round(Math.random()*1e5).toString()
     })
   }
   const handlePersonAdd = (event) => {
@@ -68,11 +68,16 @@ const App = () => {
         });
       }
     } else {
-      setPersons(persons.concat(newPerson));
-      setNewPerson({
-        name:'',
-        number: ''
-      });
+      axios.post(`http://localhost:3001/persons/`, newPerson)
+      .then(response => 
+        {
+          setPersons(persons.concat(response.data));
+          setNewPerson({
+            name:'',
+            number: ''
+          })
+        }
+      )
     }
   }
 
