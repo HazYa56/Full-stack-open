@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import { getAll, create, update } from "./modules"
+
 import axios from 'axios'
 
 const PersonForm = ({fieldData, onSubmit, onNameChange, onNumberChange}) => {
@@ -29,11 +31,7 @@ const App = () => {
   })
   const [persons, setPersons] = useState([])
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
+    getAll().then(responseData => setPersons(responseData))
   }, [])
   const personsSearched = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
   
@@ -68,10 +66,9 @@ const App = () => {
         });
       }
     } else {
-      axios.post(`http://localhost:3001/persons/`, newPerson)
-      .then(response => 
+      create(newPerson).then(responseData => 
         {
-          setPersons(persons.concat(response.data));
+          setPersons(persons.concat(responseData));
           setNewPerson({
             name:'',
             number: ''
