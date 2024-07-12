@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getAll, create, update } from "./modules"
+import { getAll, create, update, omit } from "./modules"
 
 import axios from 'axios'
 
@@ -18,8 +18,7 @@ const PersonForm = ({fieldData, onSubmit, onNameChange, onNumberChange}) => {
     </form>
   )
 }
-const Person = ({ name, number }) => <p>{ name } { number }</p>
-const Persons = ({ personList }) => { return(personList.map(person => <Person key={person.id} name={person.name} number={person.number} />)) }
+const Person = ({ name, number, onSmash  }) => <div>{ name } { number }<button onClick={onSmash}>Delete</button></div>
 const Filter = ({ searchValue, onChange }) => { return(<p>filter shown with <input value={searchValue} onChange={onChange} /></p>) }
 
 const App = () => {
@@ -77,6 +76,19 @@ const App = () => {
       )
     }
   }
+  const handlePersonDelete = (id) => {
+    if (confirm(`Delete ${persons.find(person => person.id == id).name} ?`) == true) {
+      omit(id).then(responseData =>
+        {
+          setPersons(persons.filter(person => person.id != responseData.id));
+          setNewPerson({
+            name:'',
+            number: ''
+          })
+        }
+      )
+    }
+  }
 
   return (
     <>
@@ -90,8 +102,7 @@ const App = () => {
         onNumberChange={handleNumberChange} 
       />
       <h2>Numbers</h2>
-      <Persons personList={personsSearched} />
-    </>
+      {personsSearched.map(person => <Person key={person.id} name={person.name} number={person.number} onSmash={() => handlePersonDelete(person.id)} />)}    </>
   )
 }
 
