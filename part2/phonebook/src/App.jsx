@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react'
 import { getAll, create, update, omit } from "./modules"
 
-const Notification = ({ message }) => {
+const Notification = ({ message, type }) => {
   const notificationStyle = {
-    color: "green",
+    color: type === 'error' ? "red" : "green",
     background: "lightgrey",
     fontSize: "15px",
     borderStyle: "solid",
@@ -49,7 +49,7 @@ const App = () => {
     number: ''
   })
   const [persons, setPersons] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState({ message: null, type: '' })
   useEffect(() => {
     getAll().then(responseData => setPersons(responseData))
   }, [])
@@ -60,16 +60,14 @@ const App = () => {
     setSearch(event.target.value)
   }
   const handleNameChange = (event) => {
-    setNewPerson({ 
-      id: Math.round(Math.random()*1e5).toString(),
+    setNewPerson({
+      ...newPerson,
       name: event.target.value,
-      number: newPerson.number,
     })
   }
   const handleNumberChange = (event) => {
     setNewPerson({
-      id: Math.round(Math.random()*1e5).toString(),
-      name: newPerson.name,
+      ...newPerson,
       number: event.target.value,
     })
   }
@@ -90,7 +88,7 @@ const App = () => {
     } else {
       create(newPerson).then(responseData => 
         {
-          setErrorMessage(`Added ${responseData.name}.`)
+          setErrorMessage({ message: `Added ${responseData.name}.`, type: 'success' })
           setTimeout(() => {
             setErrorMessage(null)
           }, 5000)
@@ -113,14 +111,23 @@ const App = () => {
             number: ''
           })
         }
-      )
+      ).catch(() => {
+        setErrorMessage({
+          message: `Information of ${persons.find(person => person.id === id).name} has already been removed from server`,
+          type: 'error'
+        })
+        setTimeout(() => {
+          setErrorMessage({ message: null, type: '' })
+        }, 5000)
+        setPersons(persons.filter(person => person.id !== id))
+      })
     }
   }
 
   return (
     <>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification message={errorMessage.message} type={errorMessage.type} />
       <Filter searchValue={search} onChange={handleSearchChange} />
       <h2>Add a new</h2>
       <PersonForm
