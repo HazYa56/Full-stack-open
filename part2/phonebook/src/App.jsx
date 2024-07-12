@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getAll, create, update, omit } from "./modules"
 
-import axios from 'axios'
-
 const PersonForm = ({fieldData, onSubmit, onNameChange, onNumberChange}) => {
   return (
     <form onSubmit={onSubmit}  >
@@ -40,16 +38,16 @@ const App = () => {
   }
   const handleNameChange = (event) => {
     setNewPerson({ 
+      id: Math.round(Math.random()*1e5).toString(),
       name: event.target.value,
       number: newPerson.number,
-      id: Math.round(Math.random()*1e5).toString()
     })
   }
   const handleNumberChange = (event) => {
-    setNewPerson({ 
+    setNewPerson({
+      id: Math.round(Math.random()*1e5).toString(),
       name: newPerson.name,
       number: event.target.value,
-      id: Math.round(Math.random()*1e5).toString()
     })
   }
   const handlePersonAdd = (event) => {
@@ -57,12 +55,14 @@ const App = () => {
     if (persons.map(person => person.number).includes(newPerson.number)) {
       alert(`${newPerson.number} is already added to phonebook.`);
     } else if (persons.map(person => person.name).includes(newPerson.name)) {
-      if (confirm(`Do you want to update ${newPerson.name} number ?`) == true) {
-        setPersons(persons.filter(person => person.name != newPerson.name).concat(newPerson));
-        setNewPerson({
-          name:'',
-          number: ''
-        });
+      if (confirm(`${newPerson.name} is already added to phonebook, replace the old number with a new one ?`) == true) {
+        update(persons.find(person => newPerson.name == person.name).id, newPerson).then(responseData => 
+          {setPersons(persons.filter(person => person.name != responseData.name).concat(responseData ));
+          setNewPerson({
+            name:'',
+            number: ''
+          });}
+        )
       }
     } else {
       create(newPerson).then(responseData => 
