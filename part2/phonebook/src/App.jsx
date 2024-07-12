@@ -1,6 +1,28 @@
+
 import { useState, useEffect } from 'react'
 import { getAll, create, update, omit } from "./modules"
 
+const Notification = ({ message }) => {
+  const notificationStyle = {
+    color: "green",
+    background: "lightgrey",
+    fontSize: "15px",
+    borderStyle: "solid",
+    borderRadius: "5px",
+    padding: "10px",
+    marginBottom: "10px"
+  }
+
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='error' style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
 const PersonForm = ({fieldData, onSubmit, onNameChange, onNumberChange}) => {
   return (
     <form onSubmit={onSubmit}  >
@@ -27,6 +49,7 @@ const App = () => {
     number: ''
   })
   const [persons, setPersons] = useState([])
+  const [errorMessage, setErrorMessage] = useState(null)
   useEffect(() => {
     getAll().then(responseData => setPersons(responseData))
   }, [])
@@ -67,6 +90,10 @@ const App = () => {
     } else {
       create(newPerson).then(responseData => 
         {
+          setErrorMessage(`Added ${responseData.name}.`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
           setPersons(persons.concat(responseData));
           setNewPerson({
             name:'',
@@ -93,6 +120,7 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter searchValue={search} onChange={handleSearchChange} />
       <h2>Add a new</h2>
       <PersonForm
