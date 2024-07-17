@@ -1,6 +1,9 @@
 const express = require('express')
+const morgan = require("morgan")
 const app = express()
 app.use(express.json())
+morgan.token('data', function (req, res) { return JSON.stringify(req.body) })
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
 let persons = [
   {
@@ -29,6 +32,15 @@ app.get("/api/persons", (req, res) => {
     res.json(persons)
 })
 
+app.get("/api/persons/:id", (req, res) => {
+  const person = persons.find(person => person.id == req.params.id)
+  if (person) {
+    res.json(person)
+  } else {
+    res.status(404).end()
+  }
+})
+
 app.delete('/api/persons/:id', (req, res) => {
   persons = persons.filter(person => person.id != req.params.id).concat()
   res.status(204).end()
@@ -38,7 +50,7 @@ app.post('/api/persons/', (req, res) => {
   const newPerson = req.body;
 
   if (newPerson.name !== undefined && newPerson.number !== undefined) {
-    if (newPerson.name.trim() === '' && newPerson.number.trim() === '') {
+    if (newPerson.name.trim() !== '' && newPerson.number.trim() !== '') {
       if (persons.map(person => newPerson.name == person.name).includes(true)) {
         console.log(newPerson.name);
         res.send({ error: 'name must be unique' })
