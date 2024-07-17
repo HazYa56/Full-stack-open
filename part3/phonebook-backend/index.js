@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 
-const persons = [
+let persons = [
     { 
       "id": "1",
       "name": "Arto Hellas", 
@@ -29,9 +29,9 @@ app.get("/api/persons", (req, res) => {
     res.json(persons)
 })
 
-app.get("/api/persons/:id", (req, res) => {
-  const person = persons.find(person => person.id == req.params.id)
-  res.json(person)
+app.delete('/api/persons/:id', (req, res) => {
+  persons = persons.filter(person => person.id != req.params.id).concat()
+  res.status(204).end()
 })
 
 app.get("/api/info", (req, res) =>{
